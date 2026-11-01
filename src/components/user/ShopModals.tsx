@@ -1,6 +1,22 @@
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { store, useStore, type Order } from "../../lib/store";
 import { peso, clock } from "../../lib/format";
+
+/** Locks page scroll + wires Escape while a drawer/modal is open (mobile friendly). */
+function useDialogBehaviour(onClose: () => void) {
+  const closeRef = useRef(onClose);
+  closeRef.current = onClose;
+  useEffect(() => {
+    const prev = document.body.style.overflow;
+    document.body.style.overflow = "hidden";
+    const onKey = (e: KeyboardEvent) => { if (e.key === "Escape") closeRef.current(); };
+    window.addEventListener("keydown", onKey);
+    return () => {
+      document.body.style.overflow = prev;
+      window.removeEventListener("keydown", onKey);
+    };
+  }, []);
+}
 
 const STEPS = [
   { key: "received", icon: "🧾", label: "Received" },
@@ -32,6 +48,8 @@ export function ItemModal({ itemId, onClose }: { itemId: string; onClose: () => 
   const [picked, setPicked] = useState<string[]>([]);
   const [note, setNote] = useState("");
   const [added, setAdded] = useState(false);
+
+  useDialogBehaviour(onClose);
 
   if (!item) return null;
   const suggested = useMemo(() => {
@@ -126,6 +144,8 @@ export function CartDrawer({ onClose }: { onClose: () => void }) {
   const [phone, setPhone] = useState("");
   const [type, setType] = useState<"dine-in" | "takeout">("takeout");
   const [order, setOrder] = useState<Order | null>(null);
+
+  useDialogBehaviour(onClose);
 
   const total = cart.reduce((a, l) => a + l.unitPrice * l.qty, 0);
 

@@ -26,7 +26,7 @@ database option (Supabase) and **GitHub auto-deploy** (`git push` → live).
 - 🎨 **Spline 3D hero** — live 3D animation stage (drag to orbit). Swap in your own scene via `src/config.ts`
 - 💥 **3D Exploded View Studio** — 6 items (Caramel Macchiato, Iced Latte, Cappuccino, Matcha Latte, Croissant, Club Sandwich) built layer-by-layer in 3D: slide to explode, orbit, hover any part to see what it is
 - 🍞 Truthful **scarcity badges** ("Only N left today" from live inventory) + social-proof toasts
-- 🔍 Menu search, category filter, responsive design, dark-velvet & cream art direction
+- 🔍 Menu search, category filter, dark-velvet & cream art direction
 
 **Admin control room** (`/admin`, demo PIN `2345`)
 - 📊 **Dashboard** — revenue/AOV/stock KPIs, 7-day revenue chart, live order ticker
@@ -35,6 +35,13 @@ database option (Supabase) and **GitHub auto-deploy** (`git push` → live).
 - 🍽 **Menu manager** — price edits, "86-it" availability toggle, live margin % per item
 - 📦 **Inventory** — 17 supplies vs par levels, reorder radar, one-tap restock to par
 - 🧠 **Psychology Lab** — live **Menu Engineering matrix** (Stars · Plowhorses · Puzzles · Dogs) + persuasion checklist + auto-recommended plays
+
+**📱 Responsive on every screen**
+- Breakpoints at **1020 / 820 / 640 / 420 px** — desktop, laptop, tablet, phone (from 320 px up)
+- **Storefront** — hamburger + slide-down nav, full-width search with sideways-scrolling category chips, item modal becomes a bottom sheet, cart drawer goes full width with safe-area padding
+- **Admin** — sticky top bar with a scrollable tab strip, 2-up KPI cards, panels stack, tables swipe sideways instead of squashing their columns
+- **3D** — Spline stage and exploded-view canvas reflow and use a lighter pixel ratio on phones; vertical swipes scroll the page while horizontal drags still orbit the model
+- Touch targets ≥ 44 px, visible keyboard focus, `Escape` closes menus/modals, background scroll locks while a drawer is open, and `prefers-reduced-motion` is respected
 
 ## 🚧 What we're doing (next up)
 
