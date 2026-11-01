@@ -59,6 +59,11 @@ export default function AdminSite() {
   const orders = useStore((s) => s.orders);
   const [tab, setTab] = useState("dashboard");
 
+  // when switching sections on a phone, start the new panel at the top
+  useEffect(() => {
+    if (window.scrollY > 0) window.scrollTo({ top: 0, behavior: "auto" });
+  }, [tab]);
+
   // mirror new orders to Supabase when configured
   useEffect(() => {
     if (dbMode === "supabase") {
@@ -72,28 +77,28 @@ export default function AdminSite() {
   return (
     <div className="admin-shell">
       <aside className="admin-side">
-        <div className="brand"><span className="logo">☕</span>{SHOP.name} · Admin</div>
-        {TABS.map((t) => (
-          <button
-            key={t.id}
-            className={"side-link" + (tab === t.id ? " active" : "")}
-            onClick={() => setTab(t.id)}
-          >
-            <span className="ico">{t.icon}</span>
-            {t.label}
-          </button>
-        ))}
+        <div className="brand">
+          <span className="logo">☕</span>
+          <span className="brand-name">{SHOP.name} · Admin</span>
+        </div>
+        <nav className="admin-tabs" aria-label="Admin sections">
+          {TABS.map((t) => (
+            <button
+              key={t.id}
+              className={"side-link" + (tab === t.id ? " active" : "")}
+              onClick={() => setTab(t.id)}
+            >
+              <span className="ico">{t.icon}</span>
+              <span className="lbl">{t.label}</span>
+            </button>
+          ))}
+        </nav>
         <div className="side-foot">
-          <Link to="/" style={{ color: "var(--gold-2)" }}>← View storefront</Link>
-          <br />
-          <button
-            className="mini-btn"
-            style={{ marginTop: "0.85rem" }}
-            onClick={() => store.logout()}
-          >
+          <Link to="/" className="side-storefront">← View storefront</Link>
+          <button className="mini-btn side-signout" onClick={() => store.logout()}>
             Sign out
           </button>
-          <p style={{ marginTop: "0.9rem", lineHeight: 1.6 }}>
+          <p>
             DB: {dbMode === "supabase" ? "Supabase" : "local demo"}
             <br />Skills: Chief of Staff + Marketing Psychology
           </p>
@@ -120,7 +125,7 @@ export default function AdminSite() {
               {tab === "skills" && "The operating system behind this dashboard."}
             </p>
           </div>
-          <div style={{ display: "flex", gap: "0.65rem" }}>
+          <div className="admin-head-tags">
             <span className="badge badge-dark">Hobby plan · GitHub auto-deploy</span>
             <span className="tag-live">live</span>
           </div>

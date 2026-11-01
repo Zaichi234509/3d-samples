@@ -1,4 +1,4 @@
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { Link } from "react-router-dom";
 import { useStore } from "../lib/store";
 import { peso, timeAgo } from "../lib/format";
@@ -17,6 +17,21 @@ export default function UserSite() {
   const [query, setQuery] = useState("");
   const [modalItem, setModalItem] = useState<string | null>(null);
   const [cartOpen, setCartOpen] = useState(false);
+  const [navOpen, setNavOpen] = useState(false);
+
+  // close the mobile menu on Escape, and whenever we grow past the breakpoint
+  useEffect(() => {
+    const onKey = (e: KeyboardEvent) => e.key === "Escape" && setNavOpen(false);
+    const onResize = () => window.innerWidth > 1020 && setNavOpen(false);
+    window.addEventListener("keydown", onKey);
+    window.addEventListener("resize", onResize);
+    return () => {
+      window.removeEventListener("keydown", onKey);
+      window.removeEventListener("resize", onResize);
+    };
+  }, []);
+
+  const closeNav = () => setNavOpen(false);
 
   const filtered = useMemo(
     () =>
@@ -41,24 +56,41 @@ export default function UserSite() {
       {/* ── header ─────────────────────────────────────────────────────── */}
       <header className="site-header">
         <div className="container inner">
-          <a className="brand" href="#top">
+          <a className="brand" href="#top" onClick={closeNav}>
             <span className="logo">☕</span>
-            {SHOP.name}
+            <span className="brand-name">{SHOP.name}</span>
           </a>
-          <nav className="nav-links">
-            <a href="#menu">Menu</a>
-            <a href="#studio">3D Studio</a>
-            <a href="#why">Why Velvet Brew</a>
-            <a href="#visit">Visit</a>
+          <nav className={"nav-links" + (navOpen ? " open" : "")} id="site-nav" aria-label="Main">
+            <a href="#menu" onClick={closeNav}>Menu</a>
+            <a href="#studio" onClick={closeNav}>3D Studio</a>
+            <a href="#why" onClick={closeNav}>Why Velvet Brew</a>
+            <a href="#visit" onClick={closeNav}>Visit</a>
+            <Link to="/admin" className="nav-admin" onClick={closeNav}>Admin</Link>
           </nav>
-          <div style={{ display: "flex", gap: "0.65rem", alignItems: "center" }}>
-            <Link to="/admin" className="btn btn-ghost btn-sm">Admin</Link>
-            <button className="btn btn-primary btn-sm cart-btn" onClick={() => setCartOpen(true)}>
-              🛒 Order{cartCount > 0 && <span className="cart-count">{cartCount}</span>}
+          <div className="header-actions">
+            <Link to="/admin" className="btn btn-ghost btn-sm admin-link">Admin</Link>
+            <button
+              className="btn btn-primary btn-sm cart-btn"
+              onClick={() => { closeNav(); setCartOpen(true); }}
+              aria-label="Open your order"
+            >
+              <span aria-hidden>🛒</span>
+              <span className="cart-label">Order</span>
+              {cartCount > 0 && <span className="cart-count">{cartCount}</span>}
+            </button>
+            <button
+              className={"nav-toggle" + (navOpen ? " on" : "")}
+              onClick={() => setNavOpen((v) => !v)}
+              aria-expanded={navOpen}
+              aria-controls="site-nav"
+              aria-label={navOpen ? "Close menu" : "Open menu"}
+            >
+              <span /><span /><span />
             </button>
           </div>
         </div>
       </header>
+      {navOpen && <div className="nav-scrim" onClick={closeNav} aria-hidden />}
 
       {/* ── hero ───────────────────────────────────────────────────────── */}
       <section className="hero" id="top">
@@ -114,14 +146,16 @@ export default function UserSite() {
           </div>
 
           <div className="menu-toolbar">
-            <button className={"chip" + (cat === "all" ? " active" : "")} onClick={() => setCat("all")}>
-              All
-            </button>
-            {CATEGORIES.map((c) => (
-              <button key={c.id} className={"chip" + (cat === c.id ? " active" : "")} onClick={() => setCat(c.id)}>
-                {c.name}
+            <div className="chip-row" role="group" aria-label="Filter by category">
+              <button className={"chip" + (cat === "all" ? " active" : "")} onClick={() => setCat("all")}>
+                All
               </button>
-            ))}
+              {CATEGORIES.map((c) => (
+                <button key={c.id} className={"chip" + (cat === c.id ? " active" : "")} onClick={() => setCat(c.id)}>
+                  {c.name}
+                </button>
+              ))}
+            </div>
             <div className="search-box">
               <span>🔎</span>
               <input
@@ -136,7 +170,7 @@ export default function UserSite() {
           {/* category spotlight */}
           {cat !== "all" && (
             <div
-              className="card"
+              className="card cat-spot"
               style={{
                 display: "flex", alignItems: "center", gap: "1.35rem", padding: "1.15rem 1.45rem",
                 marginBottom: "1.75rem", background: "linear-gradient(120deg, rgba(201,160,106,0.18), var(--paper))",
@@ -145,6 +179,7 @@ export default function UserSite() {
               <img
                 src={CATEGORIES.find((c) => c.id === cat)!.image}
                 alt=""
+                className="cat-spot-img"
                 style={{ width: 84, height: 84, borderRadius: 18, objectFit: "cover" }}
               />
               <div>
@@ -243,7 +278,7 @@ export default function UserSite() {
 
           {/* social proof + scarcity line (marketing psychology, honestly applied) */}
           <div
-            className="card"
+            className="card social-strip"
             style={{
               marginTop: "2.25rem", padding: "1.65rem 1.95rem", display: "flex",
               alignItems: "center", gap: "1.35rem", flexWrap: "wrap",

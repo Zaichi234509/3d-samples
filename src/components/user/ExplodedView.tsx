@@ -121,7 +121,7 @@ export default function ExplodedView() {
       <div className="studio-layout">
         <div>
           <div className="canvas-wrap">
-            <Canvas camera={{ position: [2.6, 1.6, 3.4], fov: 42 }} dpr={[1, 2]}>
+            <Canvas camera={{ position: [2.6, 1.6, 3.4], fov: 42 }} dpr={[1, 1.75]}>
               <Scene model={model} explode={explode} hovered={hovered} onHover={setHovered} />
             </Canvas>
           </div>
@@ -141,14 +141,15 @@ export default function ExplodedView() {
             </button>
           </div>
           <p style={{ color: "rgba(250,244,234,0.55)", fontSize: "0.88rem", marginTop: "0.9rem" }}>
-            {model.caption} · Drag to orbit · Scroll to zoom · Hover a part to highlight it.
+            {model.caption} · Drag to orbit · Pinch or scroll to zoom · Hover or tap a part to highlight it.
           </p>
         </div>
 
         <div className="parts-legend" aria-label="Parts list">
           {model.parts.map((p, i) => (
-            <div
+            <button
               key={p.id}
+              type="button"
               className="part-row"
               style={{
                 borderColor: hovered === p.id ? "rgba(201,160,106,0.8)" : undefined,
@@ -156,13 +157,14 @@ export default function ExplodedView() {
               }}
               onMouseEnter={() => setHovered(p.id)}
               onMouseLeave={() => setHovered(null)}
+              onClick={() => setHovered(hovered === p.id ? null : p.id)}
             >
-              <div className="swatch" style={{ background: p.color }} />
-              <div>
+              <span className="swatch" style={{ background: p.color }} />
+              <span className="part-text">
                 <b>{i + 1}. {p.label}</b>
                 <span>{p.note}</span>
-              </div>
-            </div>
+              </span>
+            </button>
           ))}
         </div>
       </div>
